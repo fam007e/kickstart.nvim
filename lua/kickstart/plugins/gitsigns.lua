@@ -5,13 +5,21 @@
 ---@module 'lazy'
 ---@type LazySpec
 return {
-  'lewis6991/gitsigns.nvim',
-  ---@module 'gitsigns'
-  ---@type Gitsigns.Config
-  ---@diagnostic disable-next-line: missing-fields
-  opts = {
-    on_attach = function(bufnr)
-      local gitsigns = require 'gitsigns'
+  {
+    'lewis6991/gitsigns.nvim',
+    ---@module 'gitsigns'
+    ---@type Gitsigns.Config
+    ---@diagnostic disable-next-line: missing-fields
+    opts = {
+      signs = {
+        add = { text = '+' },
+        change = { text = '~' },
+        delete = { text = '_' },
+        topdelete = { text = '‾' },
+        changedelete = { text = '~' },
+      },
+      on_attach = function(bufnr)
+        local gitsigns = require 'gitsigns'
 
       local function map(mode, l, r, opts)
         opts = opts or {}
@@ -55,4 +63,5 @@ return {
       map('n', '<leader>tD', gitsigns.preview_hunk_inline, { desc = '[T]oggle git show [D]eleted' })
     end,
   },
+},
 }
