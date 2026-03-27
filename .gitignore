@@ -12,3 +12,10 @@ spell/
 lazy-lock.json
 
 .DS_Store
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.pdf
+!doc/nvim_guide.pdf
