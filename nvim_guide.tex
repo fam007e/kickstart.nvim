@@ -1,0 +1,172 @@
+\documentclass[11pt,landscape]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{multicol}
+\usepackage{calc}
+\usepackage{ifthen}
+\usepackage[landscape]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\geometry{top=.5in,left=.5in,right=.5in,bottom=.5in}
+
+\pagestyle{empty}
+\makeatletter
+\renewcommand{\section}{\@startsection{section}{1}{0mm}%
+                                {-1ex plus -.5ex minus -.2ex}%
+                                {0.5ex plus .2ex}%x
+                                {\normalfont\large\bfseries}}
+\makeatother
+
+\definecolor{myblue}{RGB}{0,0,128}
+\definecolor{mygrey}{RGB}{128,128,128}
+
+\begin{document}
+
+\raggedright
+\footnotesize
+% --- Header ---
+\begin{center}
+     \Large{\textbf{Forked Kickstart.nvim Keybindings}} \\
+\end{center}
+
+\setlength{\premulticols}{1pt}
+\setlength{\postmulticols}{1pt}
+\setlength{\multicolsep}{1pt}
+\setlength{\columnsep}{2pt}
+
+\begin{multicols}{3}
+
+% --- General ---
+\section{General}
+\begin{tabular}{@{}ll@{}}
+\texttt{<Esc>} & Clear search highlights \\
+\texttt{<leader>q} & Open diagnostic [Q]uickfix list \\
+\texttt{<leader>f} & [F]ormat buffer (Conform) \\
+\texttt{<leader>z} & [Z]en Mode (Toggle Center) \\
+\texttt{gcc} / \texttt{gc} & Comment line (Normal / Visual) \\
+\texttt{gbc} / \texttt{gb} & Comment block (Normal / Visual) \\
+\texttt{u} / \texttt{CTRL-r} & [u]ndo / [r]edo change \\
+\texttt{.} & Repeat last edit/mapping \\
+\texttt{<Esc><Esc>} & Exit terminal mode (in terminal) \\
+\end{tabular}
+
+% --- Navigation ---
+\section{Navigation (Buffers \& Files)}
+\begin{tabular}{@{}ll@{}}
+\texttt{<C-h,l,j,k>} & Move focus to Window \\
+\texttt{<leader>bd} & [B]uffer [D]elete (Smart) \\
+\texttt{:bd} & Delete buffer / Go up Dir \\
+\texttt{<leader>fb} & [F]ile [B]rowser (Telescope) \\
+\texttt{-} / \texttt{\_} & [Oil]: Up / Open CWD \\
+\texttt{..} / \texttt{<BS>} & [Oil]: Go Up directory \\
+\texttt{h} / \texttt{l} & [Oil]: Up / Open Select \\
+\end{tabular}
+
+% --- Basic Vim Motions ---
+\section{Vim Motions (Text Navigation)}
+\begin{tabular}{@{}ll@{}}
+\texttt{h, j, k, l} & Move Left, Down, Up, Right \\
+\texttt{w} / \texttt{b} & Move [w]ord fwd / [b]ack \\
+\texttt{e} / \texttt{ge} & End of word / End of prev \\
+\texttt{0} / \texttt{\$} & Start / End of Line \\
+\texttt{\^{}} / \texttt{g\_} & First/Last non-blank char \\
+\texttt{\{} / \texttt{\}} & Prev / Next Paragraph \\
+\texttt{\%} & Jump to matching pair ()[]\{\} \\
+\texttt{gg} / \texttt{G} & Top / Bottom of file \\
+\texttt{M, H, L} & [M]id, [H]igh, [L]ow of screen \\
+\texttt{gm} & Go to [m]iddle of text line \\
+\texttt{*} / \texttt{\#} & Search word under cursor (fwd/bk) \\
+\texttt{f/t <char>} & Find/Till next char on line \\
+\texttt{F/T <char>} & Find/Till prev char on line \\
+\texttt{; / ,} & Repeat last find/till (fwd/back) \\
+\end{tabular}
+
+% --- AI Autocomplete (Supermaven) ---
+\section{AI Autocomplete (Supermaven)}
+\begin{tabular}{@{}ll@{}}
+\texttt{<Tab>} & Accept AI suggestion \\
+\texttt{<C-j>} & Accept only the next word \\
+\texttt{<C-]>} & Clear AI suggestion \\
+\texttt{:Supermaven Login} & Login to Supermaven \\
+\end{tabular}
+
+% --- Search (Telescope) ---
+\section{Search (Telescope)}
+\begin{tabular}{@{}ll@{}}
+\texttt{<leader>sh} & [S]earch [H]elp \\
+\texttt{<leader>sk} & [S]earch [K]eymaps \\
+\texttt{<leader>sf} & [S]earch [F]iles \\
+\texttt{<leader>ss} & [S]earch [S]elect Telescope \\
+\texttt{<leader>sw} & [S]earch current [W]ord \\
+\texttt{<leader>sg} & [S]earch by [G]rep \\
+\texttt{<leader>sd} & [S]earch [D]iagnostics \\
+\texttt{<leader>sr} & [S]earch [R]esume \\
+\texttt{<leader>s.} & [S]earch Recent Files \\
+\texttt{<leader><leader>} & Find existing buffers \\
+\texttt{<leader>/} & Fuzzily search in current buffer \\
+\texttt{<leader>s/} & Search in Open Files \\
+\texttt{<leader>sn} & [S]earch [N]eovim files \\
+\end{tabular}
+
+% --- LSP Actions & Languages ---
+\section{LSP Actions \& Languages}
+\begin{tabular}{@{}ll@{}}
+\texttt{gd} & [G]oto [D]efinition \\
+\texttt{gr} & [G]oto [R]eferences \\
+\texttt{gI} & [G]oto [I]mplementation \\
+\texttt{<leader>D} & Type [D]efinition \\
+\texttt{<leader>ds} & [D]ocument [S]ymbols \\
+\texttt{<leader>ws} & [W]orkspace [S]ymbols \\
+\texttt{<leader>rn} & [R]e[n]ame \\
+\texttt{<leader>ca} & [C]ode [A]ction \\
+\texttt{gD} & [G]oto [D]eclaration \\
+\texttt{<leader>th} & [T]oggle Inlay [H]ints \\
+\hline
+\textbf{Supported:} & Python, C/C++, JS/TS, Node, \\
+& Bash/Zsh, JSON, Lua, HTML. \\
+\end{tabular}
+
+% --- Git (Gitsigns) ---
+\section{Git (Gitsigns)}
+\begin{tabular}{@{}ll@{}}
+\texttt{]c} & Jump to next git [c]hange \\
+\texttt{[c} & Jump to previous git [c]hange \\
+\texttt{<leader>hs} & Git [s]tage hunk \\
+\texttt{<leader>hr} & Git [r]eset hunk \\
+\texttt{<leader>hS} & Git [S]tage buffer \\
+\texttt{<leader>hu} & Git [u]ndo stage hunk \\
+\texttt{<leader>hR} & Git [R]eset buffer \\
+\texttt{<leader>hp} & Git [p]review hunk \\
+\texttt{<leader>hb} & Git [b]lame line \\
+\texttt{<leader>hd} & Git [d]iff against index \\
+\texttt{<leader>hD} & Git [D]iff against last commit \\
+\texttt{<leader>tb} & [T]oggle git show [b]lame line \\
+\texttt{<leader>tD} & [T]oggle git show [D]eleted \\
+\end{tabular}
+
+% --- Advanced Actions & Macros ---
+\section{Advanced Navigation \& Macros}
+\begin{tabular}{@{}ll@{}}
+\texttt{CTRL-o} & Jump [o]lder in jumplist \\
+\texttt{CTRL-i} & Jump [i]nner (newer) in jumplist \\
+\texttt{m[a-z]} & Set [m]ark at current position \\
+\texttt{'[a-z]} & Jump to mark \\
+\texttt{q[a-z]} & Start recording macro into register \\
+\texttt{q} & Stop recording macro \\
+\texttt{@[a-z]} & Play macro from register \\
+\texttt{@@} & Play last used macro \\
+\texttt{CTRL-u / d} & Scroll half-page [u]p / [d]own \\
+\end{tabular}
+
+% --- Debugging (DAP) ---
+\section{Debugging (DAP)}
+\begin{tabular}{@{}ll@{}}
+\texttt{<F5>} & Debug: Start/Continue \\
+\texttt{<F1,F2,F3>} & Step [I]nto, [O]ver, [O]ut \\
+\texttt{<leader>b,B} & Toggle/Set Breakpoint \\
+\texttt{<F7>} & Toggle Debugger UI (last sess) \\
+\end{tabular}
+
+\end{multicols}
+\end{document}
