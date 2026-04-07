@@ -8,24 +8,24 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 
 -- [[ UI & Minimalist Options ]]
-vim.opt.number = false         -- No line numbers
+vim.opt.number = false -- No line numbers
 vim.opt.relativenumber = false -- No relative numbers
-vim.opt.signcolumn = 'no'      -- No gutter (sidebar)
-vim.opt.cursorline = true      -- Highlight the current line
-vim.opt.scrolloff = 10         -- Keep cursor centered
-vim.opt.mouse = 'a'            -- Enable mouse
-vim.opt.showmode = false       -- Mode shown in statusline
-vim.opt.breakindent = true     -- Enable break indent
-vim.opt.undofile = true        -- Save undo history
-vim.opt.ignorecase = true      -- Case-insensitive search
-vim.opt.smartcase = true       -- Smart search case
-vim.opt.splitright = true      -- Vertical splits to the right
-vim.opt.splitbelow = true      -- Horizontal splits below
-vim.opt.list = true            -- Show certain whitespace
+vim.opt.signcolumn = 'no' -- No gutter (sidebar)
+vim.opt.cursorline = true -- Highlight the current line
+vim.opt.scrolloff = 10 -- Keep cursor centered
+vim.opt.mouse = 'a' -- Enable mouse
+vim.opt.showmode = false -- Mode shown in statusline
+vim.opt.breakindent = true -- Enable break indent
+vim.opt.undofile = true -- Save undo history
+vim.opt.ignorecase = true -- Case-insensitive search
+vim.opt.smartcase = true -- Smart search case
+vim.opt.splitright = true -- Vertical splits to the right
+vim.opt.splitbelow = true -- Horizontal splits below
+vim.opt.list = true -- Show certain whitespace
 vim.opt.listchars = { tab = '» ', trail = '·', multispace = '┊' }
-vim.opt.inccommand = 'split'   -- Preview substitutions
-vim.opt.timeoutlen = 300       -- Faster popup response
-vim.opt.updatetime = 250       -- Faster diagnostic updates
+vim.opt.inccommand = 'split' -- Preview substitutions
+vim.opt.timeoutlen = 300 -- Faster popup response
+vim.opt.updatetime = 250 -- Faster diagnostic updates
 
 -- Disable built-in file explorer (Oil.nvim will take over)
 vim.g.loaded_netrw = 1
@@ -65,17 +65,15 @@ local function smart_bd(opts)
     if current_dir then
       -- Get git root safely
       local git_root = vim.fn.systemlist('git rev-parse --show-toplevel 2>/dev/null')[1]
-      local boundary = (git_root and git_root ~= "") and git_root or vim.fn.getcwd()
-      
+      local boundary = (git_root and git_root ~= '') and git_root or vim.fn.getcwd()
+
       -- Normalize paths: remove trailing slashes and ensure absolute
       local function normalize(p) return vim.fn.fnamemodify(p, ':p'):gsub('[/\\]$', '') end
       local abs_current = normalize(current_dir)
       local abs_boundary = normalize(boundary)
 
       -- If we are NOT at the boundary, go up exactly one level
-      if abs_current ~= abs_boundary and abs_current ~= "" and abs_current ~= "/" then
-        oil.open(vim.fn.fnamemodify(abs_current, ':h'))
-      end
+      if abs_current ~= abs_boundary and abs_current ~= '' and abs_current ~= '/' then oil.open(vim.fn.fnamemodify(abs_current, ':h')) end
       -- If we are at the boundary, stay here.
     end
     return
@@ -85,9 +83,7 @@ local function smart_bd(opts)
   if not ok_oil or target_buf ~= current_buf or target_file == '' or buftype ~= '' or target_file:find '^oil://' then
     local force_bang = opts.bang and '!' or ''
     local ok, err = pcall(vim.cmd, 'bd' .. force_bang .. ' ' .. target_buf)
-    if not ok and err then
-      vim.api.nvim_err_writeln(err)
-    end
+    if not ok and err then vim.api.nvim_err_writeln(err) end
     return
   end
 
@@ -96,9 +92,7 @@ local function smart_bd(opts)
   oil.open(dir)
 
   vim.schedule(function()
-    if vim.api.nvim_buf_is_valid(target_buf) then
-      pcall(vim.api.nvim_buf_delete, target_buf, { force = opts.bang })
-    end
+    if vim.api.nvim_buf_is_valid(target_buf) then pcall(vim.api.nvim_buf_delete, target_buf, { force = opts.bang }) end
   end)
 end
 
@@ -201,12 +195,18 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>fb', ':Telescope file_browser<CR>', { desc = '[F]ile [B]rowser' })
-      vim.keymap.set('n', '<leader>/', function()
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown { winblend = 10, previewer = false })
-      end, { desc = '[/] Fuzzily search in current buffer' })
-      vim.keymap.set('n', '<leader>s/', function()
-        builtin.live_grep { grep_open_files = true, prompt_title = 'Live Grep in Open Files' }
-      end, { desc = '[S]earch [/] in Open Files' })
+      vim.keymap.set(
+        'n',
+        '<leader>/',
+        function() builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown { winblend = 10, previewer = false }) end,
+        { desc = '[/] Fuzzily search in current buffer' }
+      )
+      vim.keymap.set(
+        'n',
+        '<leader>s/',
+        function() builtin.live_grep { grep_open_files = true, prompt_title = 'Live Grep in Open Files' } end,
+        { desc = '[S]earch [/] in Open Files' }
+      )
       vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end, { desc = '[S]earch [N]eovim files' })
     end,
   },
@@ -216,7 +216,7 @@ require('lazy').setup({
     'stevearc/oil.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
-      require('oil').setup({
+      require('oil').setup {
         default_file_explorer = true,
         columns = { 'icon' },
         keymaps = {
@@ -229,11 +229,11 @@ require('lazy').setup({
         view_options = {
           -- Show the parent directory ".." in the view
           is_hidden_file = function(name, bufnr)
-            if name == ".." then return false end
-            return vim.startswith(name, ".")
+            if name == '..' then return false end
+            return vim.startswith(name, '.')
           end,
         },
-      })
+      }
       vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
     end,
   },
@@ -265,9 +265,7 @@ require('lazy').setup({
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
-          local map = function(keys, func, desc)
-            vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
-          end
+          local map = function(keys, func, desc) vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc }) end
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
           map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
           map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
@@ -282,7 +280,12 @@ require('lazy').setup({
       })
 
       local servers = {
-        clangd = {}, pyright = {}, ts_ls = {}, bashls = {}, jsonls = {}, stylua = {},
+        clangd = {},
+        pyright = {},
+        ts_ls = {},
+        bashls = {},
+        jsonls = {},
+        stylua = {},
         lua_ls = { settings = { Lua = { workspace = { checkThirdParty = false } } } },
       }
 
@@ -312,9 +315,7 @@ require('lazy').setup({
     },
     config = function(_, opts)
       require('conform').setup(opts)
-      vim.keymap.set('n', '<leader>f', function()
-        require('conform').format { async = true, lsp_format = 'fallback' }
-      end, { desc = '[F]ormat buffer' })
+      vim.keymap.set('n', '<leader>f', function() require('conform').format { async = true, lsp_format = 'fallback' } end, { desc = '[F]ormat buffer' })
     end,
   },
 
@@ -372,9 +373,7 @@ require('lazy').setup({
       ---@param language string
       local function treesitter_try_attach(buf, language)
         -- check if parser exists and load it
-        if not vim.treesitter.language.add(language) then
-          return
-        end
+        if not vim.treesitter.language.add(language) then return end
         -- enables syntax highlighting and other treesitter features
         vim.treesitter.start(buf, language)
 
@@ -392,9 +391,7 @@ require('lazy').setup({
         callback = function(args)
           local buf, filetype = args.buf, args.match
           local language = vim.treesitter.language.get_lang(filetype)
-          if not language then
-            return
-          end
+          if not language then return end
 
           local installed_parsers = require('nvim-treesitter').get_installed 'parsers'
 
@@ -403,9 +400,7 @@ require('lazy').setup({
             treesitter_try_attach(buf, language)
           elseif vim.tbl_contains(available_parsers, language) then
             -- if a parser is available in `nvim-treesitter` auto install it, and enable it after the installation is done
-            require('nvim-treesitter').install(language):await(function()
-              treesitter_try_attach(buf, language)
-            end)
+            require('nvim-treesitter').install(language):await(function() treesitter_try_attach(buf, language) end)
           else
             -- try to enable treesitter features in case the parser exists but is not available from `nvim-treesitter`
             treesitter_try_attach(buf, language)
