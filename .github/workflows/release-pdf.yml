@@ -2,7 +2,7 @@ name: Compile Neovim Guide PDF and Commit
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - 'nvim_guide.tex'
   workflow_dispatch:
