@@ -41,16 +41,14 @@ require('cloak').setup {
         '*.key',
       },
       multiline = true,
-      -- FIX: The original pattern was '-----BEGIN[^\n]+\n[%s%S]-+-----END[^\n]+'.
-      -- In Lua patterns, after a quantified item like [%s%S]- (lazy zero-or-more),
-      -- the following + has no item to quantify and is treated as a literal '+'.
-      -- This meant the pattern only matched PEM blocks where the last base64
-      -- character happened to be '+' -- effectively never cloaking PEM keys.
-      --
-      -- The fix: replace -+ with -\n so the lazy body match expands until it
-      -- finds the newline that precedes the -----END marker. This correctly
-      -- matches the full block body regardless of its base64 content.
+      -- Lazy match from the BEGIN line to the newline preceding the END marker.
+      -- (An earlier version used '[%s%S]-+-----END'; that also matched because the
+      -- trailing '+-' parses as a lazily-repeated literal '+', but it was needlessly obscure.)
       cloak_pattern = '-----BEGIN[^\n]+\n[%s%S]-\n-----END[^\n]+',
     },
   },
 }
+
+-- Keymaps: toggle masking (under the <leader>t toggle group), or reveal only the current line
+vim.keymap.set('n', '<leader>tc', '<cmd>CloakToggle<cr>', { desc = '[T]oggle [C]loak' })
+vim.keymap.set('n', '<leader>cp', '<cmd>CloakPreviewLine<cr>', { desc = '[C]loak: [P]review line' })

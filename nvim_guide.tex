@@ -43,11 +43,10 @@
 \begin{tabular}{@{}ll@{}}
 \texttt{<Leader>} & Space key \\
 \texttt{<Esc>} & Clear search highlights \\
-\texttt{<leader>q} & Open diagnostic [Q]uickfix list \\
-\texttt{<leader>f} & [F]ormat buffer (\texttt{conform.nvim}) \\
+\texttt{<leader>q} & Open diagnostic [Q]uickfix (location) list \\
+\texttt{<leader>f} & [F]ormat buffer (\texttt{conform}; Lua: stylua) \\
 \texttt{<leader>z} & Toggle [Z]en Mode (\texttt{zen-mode}) \\
-\texttt{gcc} / \texttt{gc} & Comment line (Normal / Visual) \\
-\texttt{gbc} / \texttt{gb} & Comment block (Normal / Visual) \\
+\texttt{gcc} / \texttt{gc} & Comment line (Normal / Visual), built-in \\
 \texttt{u} / \texttt{CTRL-r} & [u]ndo / [r]edo change \\
 \texttt{.} & Repeat last edit or command \\
 \texttt{<Esc><Esc>} & Exit builtin terminal mode \\
@@ -57,13 +56,13 @@
 \section{File Explorer \& Buffers}
 \begin{tabular}{@{}ll@{}}
 \texttt{-} & Open [Oil.nvim] parent directory \\
-\texttt{\_} & [Oil]: Open working directory (CWD) \\
+\texttt{\_} & [Oil]: Open working dir (CWD) \\
 \texttt{<BS>} / \texttt{h} & [Oil]: Go up one directory \\
 \texttt{l} & [Oil]: Open file / enter folder \\
 \texttt{g.} & [Oil]: Toggle hidden files \\
-\texttt{<leader>bd} & Smart [B]uffer [D]elete (returns to Oil) \\
-\texttt{:bd} / \texttt{:bd!} & Aliased to smart buffer delete \\
-\texttt{<C-h,j,k,l>} & Move focus to Window (Left/Down/Up/Right) \\
+\texttt{<leader>bd} & Smart [B]uffer [D]elete (to Oil) \\
+\texttt{:bd[!]} / \texttt{:bdelete[!]} & Aliased to \texttt{:Bd[!] [N|name]} \\
+\texttt{<C-h,j,k,l>} & Focus window (L/D/U/R) \\
 \end{tabular}
 
 % --- Vim Text Motions ---
@@ -91,11 +90,13 @@
 \texttt{<Tab>} & Accept Supermaven AI suggestion \\
 \texttt{<C-j>} & Accept next word of AI suggestion \\
 \texttt{<C-]>} & Clear AI suggestion \\
-\texttt{:Supermaven Login} & Authenticate Supermaven AI \\
+\texttt{:SupermavenUseFree} & Choose free tier (first run) \\
+\texttt{:SupermavenUsePro} & Link a Pro account \\
 \hline
-\textbf{Cloak.nvim:} & Auto-masks secrets, \texttt{.env}, keys, \\
-& tokens, PEM certificates, and passwords. \\
-\textbf{Wakatime:} & Automated coding metrics tracking. \\
+\texttt{<leader>tc} & [T]oggle [C]loak masking \\
+\texttt{<leader>cp} & [C]loak: [P]review current line \\
+\textbf{Cloak.nvim:} & Masks \texttt{.env*}, \texttt{secrets.*}, PEM \\
+\textbf{Wakatime:} & Coding metrics tracking. \\
 \end{tabular}
 
 % --- Search & Fuzzy Finder (Telescope) ---
@@ -126,15 +127,16 @@
 \texttt{grt} & [G]oto [T]ype Definition \\
 \texttt{grD} & [G]oto [D]eclaration \\
 \texttt{grn} & [R]e[n]ame symbol \\
-\texttt{gra} & [C]ode [A]ction \\
+\texttt{gra} & Code [A]ction \\
 \texttt{gO} & Document Symbols \\
 \texttt{gW} & Workspace Symbols \\
 \texttt{<leader>th} & [T]oggle Inlay [H]ints \\
-\texttt{:Mason} & Manage LSPs, Formatters, \& Linters \\
+\texttt{:Mason} & Manage LSP/fmt/lint tools \\
 \hline
 \textbf{Format/Completion:} & \texttt{conform.nvim}, \texttt{blink.cmp} \\
-\textbf{Languages Configured:} & Lua (\texttt{lua\_ls}), Stylua, C/C++, \\
-& Python, JS/TS, HTML, Markdown. \\
+\textbf{LSP enabled:} & \texttt{lua\_ls} only \\
+\textbf{Treesitter:} & bash, c, html, lua, markdown, \\
+& vim (+ auto-install on open) \\
 \end{tabular}
 
 % --- Git Integration (Gitsigns) ---
@@ -150,27 +152,41 @@
 \texttt{<leader>hb} & Blame current line \\
 \texttt{<leader>hd} & Diff against index \\
 \texttt{<leader>hD} & Diff against last commit \\
+\texttt{<leader>hq} / \texttt{hQ} & Hunks to quickfix (file / repo) \\
 \texttt{<leader>tb} & [T]oggle line blame \\
 \texttt{<leader>tw} & [T]oggle intra-line word diff \\
+\texttt{ih} & Text object: inside hunk (o/x) \\
 \end{tabular}
 
 % --- Mini.nvim & Text Objects ---
 \section{Text Objects \& Mini Plugins}
 \begin{tabular}{@{}ll@{}}
 \texttt{va)} & [V]isually select [A]round [)]paren \\
-\texttt{cii"} & [C]hange [I]nside [I]nner ["]quotes \\
-\texttt{saiw)} & [S]urround [A]dd [I]nner [W]ord [)]Paren \\
+\texttt{ci"} & [C]hange [I]nside ["]quotes \\
+\texttt{cii"} & Change inside \emph{next} quotes \\
+\texttt{aa} & Around \emph{next} (was \texttt{an}) \\
+\texttt{saiw)} & [S]urround [A]dd [I]nner [W]ord [)] \\
 \texttt{sd'} & [S]urround [D]elete [']quote \\
 \texttt{sr)'} & [S]urround [R]eplace [)] with ['] \\
 \textbf{Mini Modules:} & \texttt{mini.ai}, \texttt{mini.surround}, \\
 & \texttt{mini.statusline}, \texttt{mini.icons} \\
 \end{tabular}
 
+% --- Assembly Viewer ---
+\section{Assembly Viewer (C/C++/Rust)}
+\begin{tabular}{@{}ll@{}}
+\texttt{<leader>a} & [A]sm: function under cursor \\
+\texttt{<leader>a} (visual) & [A]sm: selected lines (\texttt{:Asm}) \\
+\texttt{+} / \texttt{-} & In window: raise / lower \texttt{-O} level \\
+\texttt{R} & In window: recompile \\
+\texttt{q} / \texttt{<Esc>} & In window: close \\
+\end{tabular}
+
 % --- Navigation Jump List & Macros ---
 \section{Jumplist, Marks \& Macros}
 \begin{tabular}{@{}ll@{}}
-\texttt{CTRL-o} & Jump [o]lder in jumplist \\
-\texttt{CTRL-i} & Jump [i]nner (newer) in jumplist \\
+\texttt{CTRL-o} & Jump to older position in jumplist \\
+\texttt{CTRL-i} & Jump to newer position (same key as \texttt{<Tab>}) \\
 \texttt{m[a-z]} & Set local [m]ark \\
 \texttt{'[a-z]} & Jump to mark line \\
 \texttt{`[a-z]} & Jump to exact mark position \\

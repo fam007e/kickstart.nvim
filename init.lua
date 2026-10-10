@@ -20,7 +20,7 @@ do
   vim.o.relativenumber = false -- No relative numbers
   vim.o.signcolumn = 'no' -- No gutter (sidebar)
   vim.o.cursorline = true -- Highlight the current line
-  vim.o.scrolloff = 10 -- Keep cursor centered
+  vim.o.scrolloff = 10 -- Keep 10 lines of context above/below the cursor
   vim.o.mouse = 'a' -- Enable mouse
   vim.o.showmode = false -- Mode shown in statusline
   vim.o.breakindent = true -- Enable break indent
@@ -87,21 +87,23 @@ do
     },
   }
 
-  vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+  vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix (location) list' })
 
   -- Buffer management: Close buffer and return to Oil directory
   local function smart_bd(opts)
     local ok_oil, oil = pcall(require, 'oil')
     local current_buf = vim.api.nvim_get_current_buf()
 
-    -- Handle potential buffer target from command arguments (e.g. :bd 3)
+    -- Handle potential buffer target from command arguments (e.g. :Bd 3 or :Bd init.lua).
+    -- NOTE: vim.fn.bufnr('3') treats the string as a name pattern, not a buffer number,
+    -- so numeric arguments must be handled explicitly.
     local target_buf = current_buf
     if opts.args and opts.args ~= '' then
-      local arg_buf = vim.fn.bufnr(opts.args)
-      if arg_buf ~= -1 then
+      local arg_buf = tonumber(opts.args) or vim.fn.bufnr(opts.args)
+      if arg_buf > 0 and vim.api.nvim_buf_is_valid(arg_buf) then
         target_buf = arg_buf
       else
-        vim.api.nvim_err_writeln('E94: No matching buffer for ' .. opts.args)
+        vim.notify('E94: No matching buffer for ' .. opts.args, vim.log.levels.ERROR)
         return
       end
     end
@@ -113,9 +115,8 @@ do
     if ok_oil and target_file:find '^oil://' and target_buf == current_buf then
       local current_dir = oil.get_current_dir()
       if current_dir then
-        -- Get git root safely
-        local git_root = vim.fn.systemlist('git rev-parse --show-toplevel 2>/dev/null')[1]
-        local boundary = (git_root and git_root ~= '') and git_root or vim.fn.getcwd()
+        -- Boundary is the git root of the directory being browsed (not of Neovim's CWD)
+        local boundary = vim.fs.root(current_dir, '.git') or vim.fn.getcwd()
 
         -- Normalize paths: remove trailing slashes and ensure absolute
         local function normalize(p) return vim.fn.fnamemodify(p, ':p'):gsub('[/\\]$', '') end
@@ -133,7 +134,7 @@ do
     if not ok_oil or target_buf ~= current_buf or target_file == '' or buftype ~= '' or target_file:find '^oil://' then
       local force_bang = opts.bang and '!' or ''
       local ok, err = pcall(vim.cmd, 'bd' .. force_bang .. ' ' .. target_buf)
-      if not ok and err then vim.api.nvim_err_writeln(err) end
+      if not ok and err then vim.notify(err, vim.log.levels.ERROR) end
       return
     end
 
@@ -142,22 +143,22 @@ do
     oil.open(dir)
 
     vim.schedule(function()
-      if vim.api.nvim_buf_is_valid(target_buf) then pcall(vim.api.nvim_buf_delete, target_buf, { force = opts.bang }) end
+      if not vim.api.nvim_buf_is_valid(target_buf) then return end
+      local ok, err = pcall(vim.api.nvim_buf_delete, target_buf, { force = opts.bang })
+      if not ok then vim.notify(err, vim.log.levels.ERROR) end
     end)
   end
 
   vim.api.nvim_create_user_command('Bd', smart_bd, { bang = true, nargs = '?', desc = 'Delete buffer and return to Oil' })
   vim.keymap.set('n', '<leader>bd', '<cmd>Bd<CR>', { desc = '[B]uffer [D]elete (Smart)' })
 
-  -- Robustly hook :bd and :bdelete to :Bd
-  vim.cmd [[
-    cnoreabbrev <expr> bd ((getcmdtype() == ':' && getcmdline() == 'bd') ? 'Bd' : 'bd')
-    cnoreabbrev <expr> bd! ((getcmdtype() == ':' && getcmdline() == 'bd!') ? 'Bd!' : 'bd!')
-    cnoreabbrev <expr> bdelete ((getcmdtype() == ':' && getcmdline() == 'bd') ? 'Bd' : 'bdelete')
-    cnoreabbrev <expr> bdelete! ((getcmdtype() == ':' && getcmdline() == 'bdelete!') ? 'Bd!' : 'bdelete!')
-  ]]
+  -- Hook :bd and :bdelete (with or without `!`/arguments) to :Bd.
+  -- The abbreviation fires when `!` or a space is typed, so no separate `bd!` entries are needed.
+  for _, name in ipairs { 'bd', 'bdelete' } do
+    vim.cmd(([[cnoreabbrev <expr> %s (getcmdtype() == ':' && getcmdline() == '%s') ? 'Bd' : '%s']]):format(name, name, name))
+  end
 
-  -- Window Navigation (CTRL + hjkl)
+  -- Window Navigation (CTRL + hjkl). See `:help wincmd` for a list of all window commands
   vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
   vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
   vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
@@ -176,15 +177,6 @@ do
   -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
   -- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
   -- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-
-  -- Keybinds to make split navigation easier.
-  --  Use CTRL+<hjkl> to switch between windows
-  --
-  --  See `:help wincmd` for a list of all window commands
-  vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-  vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-  vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-  vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
   -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
   -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -841,6 +833,7 @@ do
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
+      lua = { 'stylua' },
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },
@@ -903,14 +896,6 @@ do
       --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
     },
 
-    completion = {
-      ghost_text = { enabled = true },
-      -- Display a preview of the documentation for the selected item
-      documentation = { auto_show = true, auto_show_delay_ms = 500 },
-      -- Display icons next to the completion items
-      menu = { draw = { columns = { { 'label', 'label_description', gap = 1 }, { 'kind_icon', 'kind', gap = 1 } } } },
-    },
-
     appearance = {
       -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
       -- Adjusts spacing to ensure icons are aligned
@@ -921,6 +906,10 @@ do
       -- By default, you may press `<c-space>` to show the documentation.
       -- Optionally, set `auto_show = true` to show the documentation after a delay.
       documentation = { auto_show = false, auto_show_delay_ms = 500 },
+      -- Opt-in extras (these were previously dead code because of a duplicate `completion` key).
+      -- Note: ghost_text can visually clash with Supermaven's inline suggestions.
+      -- ghost_text = { enabled = true },
+      -- menu = { draw = { columns = { { 'label', 'label_description', gap = 1 }, { 'kind_icon', 'kind', gap = 1 } } } },
     },
 
     sources = {
@@ -1042,12 +1031,12 @@ do
   -- require 'custom.plugins.colorscheme'
   -- require 'custom.plugins.ui'
   -- require 'custom.plugins.git'
+
+  -- Load everything in lua/custom/plugins/ (asm, cloak, ...).
+  -- Failures are reported instead of silently swallowed; custom/plugins/init.lua isolates each module.
+  local ok, err = pcall(require, 'custom.plugins')
+  if not ok then vim.notify('custom.plugins failed to load:\n' .. tostring(err), vim.log.levels.ERROR) end
 end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
-
--- Load custom plugins
-pcall(require, 'custom.plugins')
-
 -- vim: ts=2 sts=2 sw=2 et
